@@ -1,14 +1,9 @@
 import requests
 from datetime import datetime
-import os
-from dotenv import load_dotenv
 
-# 📦 Load environment variables
-load_dotenv()
 
-FIREBASE_URL = os.getenv("FIREBASE_URL")
-API_KEY = os.getenv("API_KEY")
-USER_ID = os.getenv("USER_ID")
+from config import FIREBASE_URL, API_KEY, USER_ID
+
 
 def set_focus_state(is_working: bool):
     url = f"{FIREBASE_URL}/users/{USER_ID}/focusMode.json?auth={API_KEY}"

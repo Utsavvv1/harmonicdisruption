@@ -1,15 +1,11 @@
 import time
-import json
-import os
-from dotenv import load_dotenv
 from process_monitor import (
     is_focus_app_active,
     monitor_and_prompt_distractions,
     preempt_existing_foreground_distractions,
 )
 from firebase_db import set_focus_state
-load_dotenv()
-POLL_INTERVAL = int(os.getenv("POLL_INTERVAL", 5))
+from config import POLL_INTERVAL
 
 def main():
     print("🧠 Focus Guardian Running (PC)...")
