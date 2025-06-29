@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog
 import threading
 import json
-import os
 import time
 
 from monitor import is_focus_app_active, monitor_and_prompt, skip_existing
