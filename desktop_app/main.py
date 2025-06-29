@@ -1,23 +1,20 @@
+# main.py
+
 import time
-from process_monitor import (
-    is_focus_app_active,
-    monitor_and_prompt_distractions,
-    preempt_existing_foreground_distractions,
-)
+from monitor import is_focus_app_active, monitor_and_prompt, skip_existing
 from firebase_db import set_focus_state
 from config import POLL_INTERVAL
 
 def main():
-    print("🧠 Focus Guardian Running (PC)...")
-
-    preempt_existing_foreground_distractions()
+    print("🧠 Synapse Desktop Monitor Running...")
+    skip_existing()
 
     while True:
-        focused = is_focus_app_active()
-        set_focus_state(focused)
+        focus = is_focus_app_active()
+        set_focus_state(focus)
 
-        if focused:
-            monitor_and_prompt_distractions()
+        if focus:
+            monitor_and_prompt()
 
         time.sleep(POLL_INTERVAL)
 

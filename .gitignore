@@ -48,3 +48,7 @@ focus/android/app/profile
 focus/android/app/release
 
 *.env
+build/
+dist/
+*.spec
+*.exe
