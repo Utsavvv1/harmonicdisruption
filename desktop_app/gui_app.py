@@ -1,7 +1,9 @@
 import tkinter as tk
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox
 import threading
 import json
+import os
+import sys
 import time
 
 from monitor import is_focus_app_active, monitor_and_prompt, skip_existing
@@ -18,7 +20,13 @@ TEXT = "#1A171A"
 monitoring = False
 monitor_thread = None
 
-# --- Start/Stop Logic ---
+# 🔧 Helper for locating bundled files (e.g., in PyInstaller)
+def get_resource_path(filename):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, filename)
+    return filename
+
+# --- Start/Stop Monitoring ---
 def toggle_monitoring(label):
     global monitoring, monitor_thread
 
@@ -40,35 +48,71 @@ def monitor_loop():
             monitor_and_prompt()
         time.sleep(POLL_INTERVAL)
 
-# --- File Editor ---
-def edit_json_file(filename, title):
+# --- GUI-Based JSON List Editor (Whitelist / Blacklist) ---
+def edit_app_list(filename, title):
+    path = get_resource_path(filename)
+
     try:
-        with open(filename, "r") as f:
-            data = json.dumps(json.load(f), indent=4)
+        with open(path, "r") as f:
+            raw_data = json.load(f)
+
+        # Accepts key as either "apps", "allowed_apps", or "blocked_apps"
+        key = next((k for k in raw_data if isinstance(raw_data[k], list)), None)
+        if not key:
+            raise ValueError("No valid list key found in JSON.")
+
+        data = raw_data[key]
     except Exception as e:
         messagebox.showerror("Error", f"Couldn't load {filename}:\n{e}")
         return
 
     editor = tk.Toplevel()
     editor.title(title)
-    editor.geometry("500x400")
+    editor.geometry("400x400")
     editor.configure(bg=BACKGROUND)
 
-    text = tk.Text(editor, wrap=tk.WORD, bg="white", fg=TEXT)
-    text.insert(tk.END, data)
-    text.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+    listbox = tk.Listbox(editor, selectmode=tk.MULTIPLE, bg="white", fg=TEXT)
+    listbox.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-    def save_and_close():
+    for item in data:
+        listbox.insert(tk.END, item)
+
+    entry = tk.Entry(editor, width=30, bg="white", fg=TEXT)
+    entry.pack(pady=5)
+
+    def add_app():
+        app = entry.get().strip()
+        if app and app not in data:
+            data.append(app)
+            listbox.insert(tk.END, app)
+            save_list()
+            entry.delete(0, tk.END)
+
+    def remove_selected():
+        selected_indices = listbox.curselection()
+        for index in reversed(selected_indices):
+            app = listbox.get(index)
+            if app in data:
+                data.remove(app)
+                listbox.delete(index)
+        save_list()
+
+    def save_list():
         try:
-            new_data = json.loads(text.get("1.0", tk.END))
-            with open(filename, "w") as f:
-                json.dump(new_data, f, indent=4)
-            editor.destroy()
+            raw_data[key] = data
+            with open(path, "w") as f:
+                json.dump(raw_data, f, indent=4)
         except Exception as e:
-            messagebox.showerror("Error", f"Invalid JSON:\n{e}")
+            messagebox.showerror("Error", f"Failed to save file:\n{e}")
 
-    tk.Button(editor, text="Save & Close", command=save_and_close,
-              bg=PRIMARY, fg="white", activebackground=ACCENT).pack(pady=10)
+    tk.Button(editor, text="Add App", command=add_app,
+              bg=PRIMARY, fg="white", activebackground=ACCENT).pack(pady=5)
+
+    tk.Button(editor, text="Remove Selected", command=remove_selected,
+              bg="red", fg="white").pack(pady=5)
+
+    tk.Button(editor, text="Close", command=editor.destroy,
+              bg="gray", fg="white").pack(pady=10)
 
 # --- GUI Layout ---
 def build_gui():
@@ -90,16 +134,17 @@ def build_gui():
 
     tk.Button(root, text="Edit Whitelist", font=("Helvetica", 11),
               bg=PRIMARY, fg="white", activebackground=ACCENT,
-              command=lambda: edit_json_file("whitelist.json", "Edit Whitelist")).pack(pady=5)
+              command=lambda: edit_app_list("whitelist.json", "Edit Whitelist")).pack(pady=5)
 
     tk.Button(root, text="Edit Blacklist", font=("Helvetica", 11),
               bg=PRIMARY, fg="white", activebackground=ACCENT,
-              command=lambda: edit_json_file("blacklist.json", "Edit Blacklist")).pack(pady=5)
+              command=lambda: edit_app_list("blacklist.json", "Edit Blacklist")).pack(pady=5)
 
     tk.Button(root, text="Exit Synapse", font=("Helvetica", 11),
               bg="gray", fg="white", command=root.destroy).pack(pady=20)
 
     root.mainloop()
 
+# --- Entry Point ---
 if __name__ == "__main__":
     build_gui()
