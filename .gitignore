@@ -44,3 +44,4 @@ focus/android/app/debug
 focus/android/app/profile
 focus/android/app/release
 
+*.env
