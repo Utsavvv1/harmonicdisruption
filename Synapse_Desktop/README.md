@@ -10,7 +10,8 @@ A lightweight distraction-monitoring tool for Windows that detects and handles b
 - Prompts user for justification via a GUI.
 - Automatically kills distracting apps if no reason is given.
 - Real-time GUI to edit whitelist and blacklist.
-- Firebase integration to log distraction events (optional).
+- Firebase integration to log distraction events.
+- Syncs with Flutter based phone app to prevent distactions on phone.
 
 ---
 
