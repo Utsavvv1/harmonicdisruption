@@ -1,0 +1,32 @@
+<div data-layer="Desktop - 6" class="Desktop6" style="width: 1737px; height: 940px; min-width: 700px; min-height: 940px; padding-top: 64px; padding-bottom: 64px; background: linear-gradient(180deg, #1A171A 75%, #201E40 100%); overflow: hidden; flex-direction: column; justify-content: space-between; align-items: center; display: inline-flex">
+  <div data-layer="header" class="Header" style="align-self: stretch; padding-left: 85px; padding-right: 85px; justify-content: space-between; align-items: center; display: inline-flex">
+    <div data-layer="logo" class="Logo" style="width: 391px; height: 99px; position: relative">
+      <div data-layer="Synapse" class="Synapse" style="width: 324.33px; height: 74.96px; left: -0.08px; top: 20.58px; position: absolute; background: white"></div>
+    </div>
+    <div data-layer="hellousermessage" class="Hellousermessage" style="width: 187px; height: 35px; position: relative">
+      <div data-layer="Hello User" class="HelloUser" style="width: 166px; left: 0.25px; top: 0px; position: absolute; color: white; font-size: 29.01px; font-family: Montserrat; font-weight: 500; word-wrap: break-word; text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41)">Hello User</div>
+    </div>
+  </div>
+  <div data-layer="IDplusapps" class="Idplusapps" style="width: 672px; height: 408px; flex-direction: column; justify-content: space-between; align-items: center; display: flex">
+    <div data-layer="IDgrp" class="Idgrp" style="padding-left: 17px; padding-right: 17px; padding-top: 63px; padding-bottom: 63px; flex-direction: column; justify-content: flex-start; align-items: center; gap: 33px; display: flex">
+      <div data-layer="showsID" class="Showsid" style="width: 297px; height: 128px; position: relative">
+        <div data-layer="15tt-87yr" class="Tt87yr" style="left: 0px; top: 0px; position: absolute; color: white; font-size: 66.79px; font-family: Montserrat; font-weight: 600; word-wrap: break-word; text-shadow: 0px 4px 87px rgba(241, 241, 241, 0.69)">15tt-87yr</div>
+        <div data-layer="Your Unique ID" class="YourUniqueId" style="left: 39px; top: 93px; position: absolute; color: white; font-size: 29.01px; font-family: Montserrat; font-weight: 400; word-wrap: break-word; text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41)">Your Unique ID</div>
+      </div>
+      <div data-layer="note-box" class="NoteBox" style="padding-left: 44px; padding-right: 44px; padding-top: 17px; padding-bottom: 17px; background: #464646; box-shadow: 0px 4px 49.29999923706055px rgba(0, 0, 0, 0.26); overflow: hidden; border-radius: 49px; justify-content: center; align-items: center; gap: 17px; display: inline-flex">
+        <div data-layer="Enter this on your phone to sync with your PC" class="EnterThisOnYourPhoneToSyncWithYourPc" style="color: white; font-size: 16px; font-family: Montserrat; font-weight: 400; word-wrap: break-word; text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41)">Enter this on your phone to sync with your PC</div>
+      </div>
+    </div>
+    <div data-layer="editbuttons" class="Editbuttons" style="justify-content: center; align-items: center; gap: 15px; display: inline-flex">
+      <div data-layer="editworkapps" class="Editworkapps" style="width: 262px; padding-left: 44px; padding-right: 44px; padding-top: 17px; padding-bottom: 17px; background: #769AFF; box-shadow: 0px 4px 49.29999923706055px rgba(0, 0, 0, 0.26); overflow: hidden; border-radius: 49px; justify-content: center; align-items: center; gap: 17px; display: flex">
+        <div data-layer="Edit Work Apps" class="EditWorkApps" style="color: white; font-size: 20px; font-family: Montserrat; font-weight: 500; word-wrap: break-word; text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41)">Edit Work Apps</div>
+      </div>
+      <div data-layer="editdistractions" class="Editdistractions" style="width: 262px; padding-left: 44px; padding-right: 44px; padding-top: 17px; padding-bottom: 17px; background: #362DB7; box-shadow: 0px 4px 49.29999923706055px rgba(0, 0, 0, 0.26); overflow: hidden; border-radius: 49px; justify-content: center; align-items: center; gap: 17px; display: flex">
+        <div data-layer="Edit Distractions" class="EditDistractions" style="color: white; font-size: 20px; font-family: Montserrat; font-weight: 500; word-wrap: break-word; text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41)">Edit Distractions</div>
+      </div>
+    </div>
+  </div>
+  <div data-layer="currentmode" class="Currentmode" style="justify-content: center; align-items: center; gap: 10px; display: inline-flex">
+    <div data-layer="Focus Mode : ON" class="FocusModeOn" style="width: 405px"><span style="color: white; font-size: 46.56px; font-family: Montserrat; font-weight: 600; word-wrap: break-word; text-shadow: 0px 3px 61px rgba(0, 0, 0, 0.29)">Focus Mode : </span><span style="color: #769AFF; font-size: 46.56px; font-family: Montserrat; font-weight: 600; word-wrap: break-word; text-shadow: 0px 3px 61px rgba(0, 0, 0, 0.29)">ON</span></div>
+  </div>
+</div>
