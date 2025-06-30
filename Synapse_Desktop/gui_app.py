@@ -165,7 +165,6 @@ def build_gui():
             command()
 
         canvas.tag_bind(canvas_id, "<Button-1>", on_click)
-        # Optional: hover cursor
         canvas.tag_bind(canvas_id, "<Enter>", lambda e: canvas.config(cursor="hand2"))
         canvas.tag_bind(canvas_id, "<Leave>", lambda e: canvas.config(cursor=""))
 
