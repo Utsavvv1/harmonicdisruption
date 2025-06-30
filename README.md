@@ -62,5 +62,5 @@ python gui_app.py
 bash
 ```
 pip install pyinstaller
-pyinstaller gui_app.py --name Synapse --onefile --noconsole --icon=logosynapse.ico --add-data ".env;."
+pyinstaller gui_app.py --name Synapse --onefile --noconsole --add-data ".env;."
 ```
