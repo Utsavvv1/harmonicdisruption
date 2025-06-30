@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synapse Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: linear-gradient(180deg, #1A171A 75%, #201E40 100%);
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            -webkit-app-region: drag;
+        }
+        
+        .dashboard {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 0;
+            position: relative;
+        }
+        
+        .header {
+            width: 100%;
+            padding: 0 85px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            -webkit-app-region: no-drag;
+        }
+        
+        .logo-container {
+            width: 391px;
+            height: 99px;
+            position: relative;
+        }
+        
+        .synapse-logo {
+            position: absolute;
+            left: -0.08px;
+            top: 20.58px;
+        }
+        
+        .user-greeting {
+            color: white;
+            font-size: 29px;
+            font-weight: 500;
+            text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41);
+            transition: all 0.3s ease;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            -webkit-app-region: no-drag;
+        }
+        
+        .id-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 33px;
+            padding: 63px 17px;
+        }
+        
+        .user-id-display {
+            text-align: center;
+        }
+        
+        .user-id {
+            color: white;
+            font-size: 67px;
+            font-weight: 600;
+            text-shadow: 0px 4px 87px rgba(241, 241, 241, 0.69);
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-id:hover {
+            transform: scale(1.02);
+            text-shadow: 0px 6px 100px rgba(241, 241, 241, 0.8);
+        }
+        
+        .id-label {
+            color: white;
+            font-size: 29px;
+            font-weight: 400;
+            text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41);
+        }
+        
+        .note-box {
+            padding: 17px 44px;
+            background: rgba(70, 70, 70, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 49px;
+            box-shadow: 0px 4px 49px rgba(0, 0, 0, 0.26);
+            transition: all 0.3s ease;
+        }
+        
+        .note-box:hover {
+            background: rgba(70, 70, 70, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0px 8px 60px rgba(0, 0, 0, 0.35);
+        }
+        
+        .note-text {
+            color: white;
+            font-size: 16px;
+            font-weight: 400;
+            text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41);
+        }
+        
+        .edit-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .edit-btn {
+            padding: 17px 44px;
+            border: none;
+            border-radius: 49px;
+            color: white;
+            font-size: 20px;
+            font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 0px 2px 3px rgba(0, 0, 0, 0.41);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0px 4px 49px rgba(0, 0, 0, 0.26);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .edit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .edit-btn:hover::before {
+            left: 100%;
+        }
+        
+        .edit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0px 8px 60px rgba(0, 0, 0, 0.35);
+        }
+        
+        .edit-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .work-apps-btn {
+            background: linear-gradient(135deg, #769AFF 0%, #5A7CFF 100%);
+            width: 262px;
+        }
+        
+        .work-apps-btn:hover {
+            background: linear-gradient(135deg, #8AABFF 0%, #6B8DFF 100%);
+        }
+        
+        .distractions-btn {
+            background: linear-gradient(135deg, #362DB7 0%, #4A3DC7 100%);
+            width: 262px;
+        }
+        
+        .distractions-btn:hover {
+            background: linear-gradient(135deg, #453BC7 0%, #5B4AD7 100%);
+        }
+        
+        .focus-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+        }
+        
+        .focus-text {
+            font-size: 47px;
+            font-weight: 600;
+            text-shadow: 0px 3px 61px rgba(0, 0, 0, 0.29);
+        }
+        
+        .focus-label {
+            color: white;
+        }
+        
+        .focus-state {
+            color: #769AFF;
+            position: relative;
+        }
+        
+        .focus-state.on {
+            color: #4CAF50;
+            animation: pulse 2s infinite;
+        }
+        
+        .focus-state.off {
+            color: #FF6B6B;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-left: 15px;
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .status-indicator.on {
+            background: #4CAF50;
+            box-shadow: 0 0 25px rgba(76, 175, 80, 0.6);
+        }
+        
+        .status-indicator.off {
+            background: #FF6B6B;
+            box-shadow: 0 0 25px rgba(255, 107, 107, 0.6);
+        }
+        
+        /* Window controls */
+        .window-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            -webkit-app-region: no-drag;
+        }
+        
+        .control-btn {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .control-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .minimize-btn {
+            background: #FFBD2E;
+        }
+        
+        .close-btn {
+            background: #FF5F56;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .header {
+                padding: 0 40px;
+            }
+            
+            .user-id {
+                font-size: 50px;
+            }
+            
+            .focus-text {
+                font-size: 35px;
+            }
+            
+            .edit-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .edit-btn {
+                width: 280px;
+            }
+        }
+        
+        /* Loading animation */
+        .loading {
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        /* Glassmorphism effect for better visual appeal */
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard loading">
+        <!-- Window Controls -->
+        <div class="window-controls">
+            <button class="control-btn minimize-btn" onclick="minimizeWindow()"></button>
+            <button class="control-btn close-btn" onclick="closeWindow()"></button>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-container">
+                <div class="synapse-logo">
+                    <svg width="326" height="76" viewBox="0 0 326 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M23.2174 59.8229C18.774 59.8229 14.5225 59.192 10.4631 57.9303C6.40368 56.6686 3.22197 55.0503 0.917969 53.0754L5.44368 44.6823C7.8574 46.6023 10.71 48.1383 14.0014 49.2903C17.3477 50.3874 20.7488 50.936 24.2048 50.936C28.4288 50.936 31.7751 50.2229 34.2437 48.7966C36.7671 47.3154 38.0288 45.3132 38.0288 42.7897C38.0288 41.3634 37.5077 40.184 36.4654 39.2514C35.478 38.264 34.2163 37.4686 32.6803 36.8652C31.1991 36.2617 29.1145 35.576 26.4265 34.808C22.6963 33.7109 19.6791 32.6686 17.3751 31.6812C15.0711 30.6389 13.0963 29.1029 11.4505 27.0732C9.80483 25.0434 8.98197 22.4103 8.98197 19.1737C8.98197 15.4434 10.0243 12.1794 12.1088 9.38172C14.2483 6.58401 17.2105 4.41715 20.9957 2.88115C24.7808 1.34515 29.142 0.577148 34.0791 0.577148C37.8094 0.577148 41.3477 1.01601 44.694 1.89372C48.0403 2.71658 50.9203 3.89601 53.334 5.43201L49.1374 13.9074C46.998 12.4812 44.5843 11.384 41.8963 10.616C39.2083 9.84801 36.4105 9.464 33.5031 9.464C29.2243 9.464 25.8231 10.2594 23.2997 11.8503C20.8311 13.3863 19.5968 15.4434 19.5968 18.0217C19.5968 19.5029 20.118 20.7371 21.1603 21.7246C22.2025 22.712 23.4643 23.5074 24.9454 24.1109C26.4265 24.6594 28.5934 25.3726 31.446 26.2503C35.0665 27.2926 38.0288 28.3074 40.3328 29.2949C42.6368 30.2823 44.5843 31.736 46.1751 33.656C47.8208 35.576 48.6437 38.072 48.6437 41.144C48.6437 44.9292 47.574 48.2206 45.4345 51.0183C43.35 53.816 40.3603 55.9829 36.4654 57.5189C32.6254 59.0549 28.2094 59.8229 23.2174 59.8229Z" fill="white"/>
+                        <path d="M98.5204 15.0594L68.2393 62.8674C65.2221 67.64 62.3421 70.9314 59.5993 72.7417C56.9113 74.6069 53.6198 75.5394 49.725 75.5394C47.5307 75.5394 45.3638 75.1829 43.2244 74.4697C41.085 73.7566 39.4118 72.824 38.205 71.672L43.3067 64.184C45.3364 66.0492 47.7501 66.9817 50.5478 66.9817C52.3033 66.9817 53.8393 66.5154 55.1558 65.5829C56.4724 64.7051 57.8164 63.1692 59.1878 60.9749L60.5867 58.8354L50.2187 15.0594H60.5044L67.9101 47.6446L88.2347 15.0594H98.5204Z" fill="white"/>
+                        <path d="M123.052 14.5657C127.989 14.5657 131.884 15.8549 134.736 18.4331C137.644 21.0114 139.098 24.6594 139.098 29.3771C139.098 30.6937 138.906 32.4491 138.522 34.6434L133.667 59H123.381L128.154 34.8903C128.373 33.7931 128.483 32.6686 128.483 31.5166C128.483 26.1954 125.548 23.5349 119.678 23.5349C115.893 23.5349 112.766 24.6046 110.298 26.744C107.829 28.8286 106.156 31.9829 105.278 36.2069L100.67 59H90.3844L99.1067 15.0594H108.899L107.911 19.9143C111.861 16.3486 116.908 14.5657 123.052 14.5657Z" fill="white"/>
+                        <path d="M193.032 15.0594L184.31 59H174.518L175.423 54.4743C171.583 57.8754 166.81 59.576 161.105 59.576C157.485 59.576 154.193 58.808 151.231 57.272C148.323 55.736 146.019 53.5143 144.319 50.6069C142.618 47.6446 141.768 44.1886 141.768 40.2389C141.768 35.3566 142.838 30.968 144.977 27.0732C147.171 23.1234 150.134 20.0514 153.864 17.8572C157.649 15.6629 161.873 14.5657 166.536 14.5657C173.558 14.5657 178.55 16.8971 181.512 21.56L182.746 15.0594H193.032ZM163.738 50.7714C166.646 50.7714 169.224 50.0857 171.473 48.7143C173.777 47.288 175.587 45.3406 176.904 42.872C178.221 40.3486 178.879 37.496 178.879 34.3143C178.879 30.8583 177.864 28.1703 175.834 26.2503C173.805 24.2754 170.952 23.288 167.277 23.288C164.369 23.288 161.763 24.0011 159.459 25.4274C157.21 26.7989 155.427 28.7463 154.111 31.2697C152.794 33.7383 152.136 36.5634 152.136 39.7452C152.136 43.2012 153.151 45.9166 155.181 47.8914C157.21 49.8114 160.063 50.7714 163.738 50.7714Z" fill="white"/>
+                        <path d="M223.934 14.5657C227.555 14.5657 230.819 15.3337 233.726 16.8697C236.688 18.4057 239.02 20.6274 240.72 23.5349C242.421 26.4423 243.271 29.8709 243.271 33.8206C243.271 38.7029 242.174 43.1189 239.98 47.0686C237.84 50.9634 234.878 54.0354 231.093 56.2846C227.363 58.4789 223.194 59.576 218.586 59.576C215.13 59.576 212.112 58.9726 209.534 57.7657C206.956 56.5589 204.954 54.8034 203.527 52.4994L199.084 74.9634H188.798L200.73 15.0594H210.522L209.616 19.6674C213.456 16.2663 218.229 14.5657 223.934 14.5657ZM217.763 50.7714C220.67 50.7714 223.248 50.0857 225.498 48.7143C227.802 47.288 229.612 45.3406 230.928 42.872C232.245 40.3486 232.903 37.496 232.903 34.3143C232.903 30.8583 231.888 28.1703 229.859 26.2503C227.829 24.2754 224.976 23.288 221.301 23.288C218.394 23.288 215.788 24.0011 213.484 25.4274C211.235 26.7989 209.452 28.7463 208.135 31.2697C206.819 33.7383 206.16 36.5634 206.16 39.7452C206.16 43.2012 207.175 45.9166 209.205 47.8914C211.235 49.8114 214.087 50.7714 217.763 50.7714Z" fill="white"/>
+                        <path d="M257.634 59.576C253.904 59.576 250.338 59.1372 246.937 58.2594C243.591 57.3269 240.985 56.1749 239.12 54.8034L243.399 46.904C245.209 48.2206 247.485 49.2629 250.228 50.0309C252.971 50.7989 255.796 51.1829 258.704 51.1829C261.995 51.1829 264.464 50.744 266.109 49.8663C267.81 48.9337 268.66 47.6172 268.66 45.9166C268.66 44.6 267.947 43.64 266.521 43.0366C265.149 42.4332 262.955 41.8023 259.938 41.144C256.811 40.5406 254.233 39.9097 252.203 39.2514C250.228 38.5383 248.5 37.4137 247.019 35.8777C245.593 34.2869 244.88 32.12 244.88 29.3771C244.88 24.824 246.772 21.2309 250.557 18.5977C254.397 15.9097 259.472 14.5657 265.78 14.5657C268.797 14.5657 271.732 14.9223 274.585 15.6354C277.437 16.2937 279.769 17.1989 281.579 18.3509L277.794 26.2503C275.984 25.0983 273.927 24.248 271.623 23.6994C269.373 23.1509 267.097 22.8766 264.793 22.8766C261.556 22.8766 259.088 23.3703 257.387 24.3577C255.741 25.3451 254.919 26.6343 254.919 28.2252C254.919 29.6514 255.632 30.6937 257.058 31.352C258.539 31.9554 260.816 32.5863 263.888 33.2446C266.96 33.848 269.483 34.5063 271.458 35.2194C273.433 35.8777 275.133 36.9749 276.56 38.5109C277.986 40.0469 278.699 42.1314 278.699 44.7646C278.699 49.4823 276.779 53.1303 272.939 55.7086C269.099 58.2869 263.997 59.576 257.634 59.576Z" fill="white"/>
+                        <path d="M325.244 33.8206C325.244 35.96 325.024 38.0446 324.586 40.0743H289.696C289.861 47.2606 294.085 50.8537 302.368 50.8537C304.892 50.8537 307.251 50.4697 309.445 49.7017C311.639 48.8789 313.504 47.7543 315.04 46.328L319.319 53.4869C317.07 55.5166 314.355 57.0526 311.173 58.0949C308.046 59.0823 304.755 59.576 301.299 59.576C296.91 59.576 293.07 58.7806 289.779 57.1897C286.542 55.5989 284.046 53.3497 282.291 50.4423C280.535 47.48 279.658 44.0789 279.658 40.2389C279.658 35.3566 280.727 30.968 282.867 27.0732C285.061 23.1234 288.078 20.0514 291.918 17.8572C295.813 15.6629 300.174 14.5657 305.002 14.5657C311.146 14.5657 316.055 16.2937 319.731 19.7497C323.406 23.1509 325.244 27.8412 325.244 33.8206ZM304.508 22.7943C301.052 22.7943 298.09 23.7269 295.621 25.592C293.207 27.4571 291.534 30.008 290.602 33.2446H315.781C315.836 29.9532 314.821 27.4023 312.736 25.592C310.707 23.7269 307.964 22.7943 304.508 22.7943Z" fill="white"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="user-greeting" id="userGreeting">Hello User</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- ID Section -->
+            <div class="id-section">
+                <div class="user-id-display">
+                    <div class="user-id" id="userId">15TT-87YR</div>
+                    <div class="id-label">Your Unique ID</div>
+                </div>
+                <div class="note-box glass-effect">
+                    <div class="note-text">Enter this on your phone to sync with your PC</div>
+                </div>
+            </div>
+            
+            <!-- Edit Buttons -->
+            <div class="edit-buttons">
+                <button class="edit-btn work-apps-btn" onclick="editWorkApps()">
+                    Edit Work Apps
+                </button>
+                <button class="edit-btn distractions-btn" onclick="editDistractions()">
+                    Edit Distractions
+                </button>
+            </div>
+        </div>
+        
+        <!-- Focus Status -->
+        <div class="focus-status">
+            <span class="focus-text focus-label">Focus Mode : </span>
+            <span class="focus-text focus-state on" id="focusState">ON</span>
+            <div class="status-indicator on" id="statusIndicator"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Simulate real-time data updates
+        let focusMode = true;
+        let userId = "15TT-87YR";
+        
+        // Initialize the dashboard
+        function initDashboard() {
+            updateFocusStatus();
+            updateUserId();
+            
+            // Add loading animation
+            setTimeout(() => {
+                document.querySelector('.dashboard').classList.add('loading');
+            }, 100);
+        }
+        
+        // Update focus status
+        function updateFocusStatus() {
+            const focusStateElement = document.getElementById('focusState');
+            const statusIndicator = document.getElementById('statusIndicator');
+            
+            if (focusMode) {
+                focusStateElement.textContent = 'ON';
+                focusStateElement.className = 'focus-text focus-state on';
+                statusIndicator.className = 'status-indicator on';
+            } else {
+                focusStateElement.textContent = 'OFF';
+                focusStateElement.className = 'focus-text focus-state off';
+                statusIndicator.className = 'status-indicator off';
+            }
+        }
+        
+        // Update user ID
+        function updateUserId() {
+            document.getElementById('userId').textContent = userId;
+        }
+        
+        // Button handlers
+        function editWorkApps() {
+            console.log('Opening Work Apps editor...');
+            // This would communicate with your Python backend
+            // You can use IPC (Inter-Process Communication) with Electron
+            // or HTTP requests to your Python server
+        }
+        
+        function editDistractions() {
+            console.log('Opening Distractions editor...');
+            // Similar to above
+        }
+        
+        // Window controls
+        function minimizeWindow() {
+            // Electron IPC to minimize window
+            console.log('Minimizing window...');
+        }
+        
+        function closeWindow() {
+            // Electron IPC to close window
+            console.log('Closing window...');
+        }
+        
+        // Simulate real-time updates from Python backend
+        function simulateDataUpdates() {
+            setInterval(() => {
+                // This would be replaced with actual data from your Python backend
+                // focusMode = Math.random() > 0.5;
+                // updateFocusStatus();
+            }, 5000);
+        }
+        
+        // Copy ID to clipboard functionality
+        document.getElementById('userId').addEventListener('click', function() {
+            navigator.clipboard.writeText(userId).then(() => {
+                // Show brief animation or notification
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
+        
+        // Start simulating updates
+        simulateDataUpdates();
+    </script>
+</body>
+</html>
