@@ -24,10 +24,12 @@ def monitor_loop():
 
         # 🔁 Thread-safe GUI update
         if focused:
-            status_label.after(0, lambda: status_label.config(text="Monitoring: ON"))
+            status_label.after(0, lambda: status_label.config(text="Monitoring: ON", fg="green"))
+
             monitor_and_prompt()
         else:
-            status_label.after(0, lambda: status_label.config(text="Monitoring: OFF"))
+            status_label.after(0, lambda: status_label.config(text="Monitoring: OFF", fg="red"))
+
 
         time.sleep(POLL_INTERVAL)
 
@@ -124,13 +126,14 @@ def build_gui():
     instruction_canvas = tk.Canvas(root, width=380, height=40, bg=BACKGROUND, highlightthickness=0)
     instruction_canvas.pack(pady=(0, 10))
 
-    draw_rounded_rect(instruction_canvas, 5, 5, 375, 35, r=10, fill="gray", outline="gray")
+    draw_rounded_rect(instruction_canvas, 5, 5, 375, 35, r=10, fill="#2A2A2A", outline="#2A2A2A")
     instruction_canvas.create_text(190, 20, text="Enter this on your phone to sync with your PC",
                                    fill=TEXT, font=("Montserrat", 12))
 
     global status_label
     status_label = tk.Label(root, text="Monitoring: OFF", font=("Montserrat", 12),
-                            fg=TEXT, bg=BACKGROUND)
+                        fg="red", bg=BACKGROUND)
+
 
     status_label.pack(pady=5)
 
