@@ -22,17 +22,13 @@ def monitor_loop():
         focused = is_focus_app_active()
         set_focus_state(focused)
 
-        # 🔁 Thread-safe GUI update
         if focused:
             status_label.after(0, lambda: status_label.config(text="Monitoring: ON", fg="green"))
-
             monitor_and_prompt()
         else:
             status_label.after(0, lambda: status_label.config(text="Monitoring: OFF", fg="red"))
 
-
         time.sleep(POLL_INTERVAL)
-
 
 def edit_app_list(filepath, title):
     try:
@@ -87,16 +83,13 @@ def edit_app_list(filepath, title):
     tk.Button(editor, text="Remove Selected", command=remove_selected, bg="red", fg="white").pack(pady=5)
     tk.Button(editor, text="Close", command=editor.destroy, bg="gray", fg="white").pack(pady=5)
 
-
 def draw_rounded_rect(canvas, x1, y1, x2, y2, r, **kwargs):
-    """Draw a rounded rectangle on a canvas."""
     canvas.create_arc(x1, y1, x1+r*2, y1+r*2, start=90, extent=90, style='pieslice', **kwargs)
     canvas.create_arc(x2-r*2, y1, x2, y1+r*2, start=0, extent=90, style='pieslice', **kwargs)
     canvas.create_arc(x1, y2-r*2, x1+r*2, y2, start=180, extent=90, style='pieslice', **kwargs)
     canvas.create_arc(x2-r*2, y2-r*2, x2, y2, start=270, extent=90, style='pieslice', **kwargs)
     canvas.create_rectangle(x1+r, y1, x2-r, y2, **kwargs)
     canvas.create_rectangle(x1, y1+r, x2, y2-r, **kwargs)
-
 
 def build_gui():
     global monitoring, monitor_thread
@@ -118,49 +111,75 @@ def build_gui():
     tk.Label(root, text="Synapse", font=("Montserrat", 16, "bold"),
              fg=TEXT, bg=BACKGROUND).pack(pady=(10, 5))
 
-    # 👤 User ID Label
-    tk.Label(root, text=f"User ID: {USER_ID}", font=("Montserrat", 14),
-             fg=TEXT, bg=BACKGROUND).pack(pady=(0, 5))
+    user_canvas = tk.Canvas(root, width=400, height=30, bg=BACKGROUND, highlightthickness=0)
+    user_canvas.pack(pady=(0, 5))
 
- # 🟦 Rounded Instruction Label using Canvas
+    font_spec = ("Montserrat", 14)
+
+    # Measure text width
+    tmp = tk.Label(root, font=font_spec)
+    user_id_text = f"{USER_ID}"
+    label_text = "User ID:"
+
+    label_width = tmp.tk.call("font", "measure", font_spec, "-displayof", ".", label_text)
+    user_id_width = tmp.tk.call("font", "measure", font_spec, "-displayof", ".", user_id_text)
+    total_width = int(label_width) + int(user_id_width) + 1
+
+    # Start drawing from center
+    start_x = 200 - (total_width // 2)
+
+    user_canvas.create_text(start_x, 15, text=label_text, fill=TEXT, font=font_spec, anchor="w")
+    user_canvas.create_text(start_x + label_width, 15, text=user_id_text, fill=ACCENT, font=font_spec, anchor="w")
+
+
+
     instruction_canvas = tk.Canvas(root, width=380, height=40, bg=BACKGROUND, highlightthickness=0)
     instruction_canvas.pack(pady=(0, 10))
-
     draw_rounded_rect(instruction_canvas, 5, 5, 375, 35, r=10, fill="#2A2A2A", outline="#2A2A2A")
     instruction_canvas.create_text(190, 20, text="Enter this on your phone to sync with your PC",
                                    fill=TEXT, font=("Montserrat", 12))
 
     global status_label
     status_label = tk.Label(root, text="Monitoring: OFF", font=("Montserrat", 12),
-                        fg="red", bg=BACKGROUND)
-
-
+                            fg="red", bg=BACKGROUND)
     status_label.pack(pady=5)
 
     monitoring = True
     monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
     monitor_thread.start()
 
-     # 📦 Button Frame for uniform layout
     button_frame = tk.Frame(root, bg=BACKGROUND)
     button_frame.pack(pady=(10, 20), fill=tk.X)
 
-    def create_full_width_button(text, bg_color, command):
-        btn = tk.Button(button_frame, text=text, font=("Montserrat", 11),
-                        bg=bg_color, fg="white", relief="flat", height=2,
-                        activebackground=bg_color, activeforeground="white",
-                        command=command)
-        btn.pack(pady=5, padx=40, fill=tk.X)  # fill X + padding = uniform look
+    def create_rounded_canvas_button(text, bg_color, command):
+        frame = tk.Frame(button_frame, bg=BACKGROUND)
+        frame.pack(pady=5, padx=40, fill=tk.X)
 
-    create_full_width_button("Edit Whitelist", ACCENT,
-                             lambda: edit_app_list(WHITELIST_FILE, "Whitelist"))
+        canvas = tk.Canvas(frame, height=45, bg=BACKGROUND, highlightthickness=0)
+        canvas.pack(fill=tk.X)
 
-    create_full_width_button("Edit Blacklist", PRIMARY,
-                             lambda: edit_app_list(BLACKLIST_FILE, "Blacklist"))
+        width = 380
+        radius = 15
+        x1, y1, x2, y2 = 5, 5, width-5, 40
 
-    create_full_width_button("Exit Synapse", "gray", graceful_exit)
+        draw_rounded_rect(canvas, x1, y1, x2, y2, r=radius, fill=bg_color, outline=bg_color)
 
+        canvas_id = canvas.create_text((width)//2, 22, text=text, fill="white",
+                                       font=("Montserrat", 11, "bold"))
 
+        def on_click(event):
+            command()
+
+        canvas.tag_bind(canvas_id, "<Button-1>", on_click)
+        canvas.bind("<Button-1>", on_click)
+
+    create_rounded_canvas_button("Edit Whitelist", ACCENT,
+                                 lambda: edit_app_list(WHITELIST_FILE, "Whitelist"))
+
+    create_rounded_canvas_button("Edit Blacklist", PRIMARY,
+                                 lambda: edit_app_list(BLACKLIST_FILE, "Blacklist"))
+
+    create_rounded_canvas_button("Exit Synapse", "gray", graceful_exit)
 
     root.mainloop()
 
