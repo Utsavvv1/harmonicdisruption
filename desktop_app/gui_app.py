@@ -21,9 +21,16 @@ def monitor_loop():
     while monitoring:
         focused = is_focus_app_active()
         set_focus_state(focused)
+
+        # 🔁 Thread-safe GUI update
         if focused:
+            status_label.after(0, lambda: status_label.config(text="Monitoring: ON"))
             monitor_and_prompt()
+        else:
+            status_label.after(0, lambda: status_label.config(text="Monitoring: OFF"))
+
         time.sleep(POLL_INTERVAL)
+
 
 def edit_app_list(filepath, title):
     try:
@@ -121,12 +128,13 @@ def build_gui():
     instruction_canvas.create_text(190, 20, text="Enter this on your phone to sync with your PC",
                                    fill=TEXT, font=("Montserrat", 12))
 
+    global status_label
     status_label = tk.Label(root, text="Monitoring: OFF", font=("Montserrat", 12),
                             fg=TEXT, bg=BACKGROUND)
+
     status_label.pack(pady=5)
 
     monitoring = True
-    status_label.config(text="Monitoring: ON")
     monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
     monitor_thread.start()
 
