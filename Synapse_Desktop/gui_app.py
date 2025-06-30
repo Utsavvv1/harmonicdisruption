@@ -23,10 +23,10 @@ def monitor_loop():
         set_focus_state(focused)
 
         if focused:
-            status_label.after(0, lambda: status_label.config(text="Monitoring: ON", fg="green"))
+            status_label.after(0, lambda: status_label.config(text="Focus Mode: ON", fg="green"))
             monitor_and_prompt()
         else:
-            status_label.after(0, lambda: status_label.config(text="Monitoring: OFF", fg="red"))
+            status_label.after(0, lambda: status_label.config(text="Focus Mode OFF", fg="red"))
 
         time.sleep(POLL_INTERVAL)
 
@@ -134,7 +134,7 @@ def build_gui():
                                    fill=TEXT, font=("Montserrat", 12))
 
     global status_label
-    status_label = tk.Label(root, text="Monitoring: OFF", font=("Montserrat", 12),
+    status_label = tk.Label(root, text="Focus Mode: OFF", font=("Montserrat", 12),
                             fg="red", bg=BACKGROUND)
     status_label.pack(pady=5)
 
