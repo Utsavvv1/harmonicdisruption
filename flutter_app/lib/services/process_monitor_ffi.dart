@@ -67,4 +67,9 @@ class ProcessMonitor {
       calloc.free(buffer);
     }
   }
+
+  static void focusProcess(String exeName) {
+    // TODO: Implement in native DLL: bring the window of exeName to the foreground
+    print('[ProcessMonitor] TODO: Focus process $exeName');
+  }
 }

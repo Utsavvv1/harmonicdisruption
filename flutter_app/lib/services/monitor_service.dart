@@ -5,25 +5,55 @@ import 'config_service.dart';
 import 'firebase_service.dart';
 import 'process_monitor_ffi.dart';
 
+// UNIQUE_PRINT_1: File loaded
+void _uniqueMonitorServiceFileLoaded() {
+  print('UNIQUE_MONITOR_SERVICE_FILE_LOADED_12345');
+}
+
+final _ = _uniqueMonitorServiceFileLoaded();
+
 class MonitorService {
+  // UNIQUE_PRINT_2: Class loaded
+  static final _uniqueClassLoaded =
+      (() {
+        print('UNIQUE_MONITOR_SERVICE_CLASS_LOADED_ABCDE');
+        return true;
+      })();
+
   Timer? _timer;
   bool monitoring = false;
   String? _lastPromptedApp;
+  final Map<String, Timer> _temporaryUnblacklistTimers = {};
+  final Set<String> _appsWithOpenPrompt = {};
+
+  MonitorService() {
+    print('UNIQUE_MONITOR_SERVICE_CONSTRUCTOR_CALLED_99999');
+  }
 
   void startMonitoring(BuildContext context) {
+    print('UNIQUE_PRINT_3: startMonitoring called');
     monitoring = true;
-    _timer = Timer.periodic(const Duration(seconds: 2), (_) => _poll(context));
+    _timer = Timer.periodic(
+      const Duration(milliseconds: 100),
+      (_) => _poll(context),
+    );
   }
 
   void stopMonitoring() {
+    print('UNIQUE_PRINT_4: stopMonitoring called');
     monitoring = false;
     _timer?.cancel();
-    _lastPromptedApp = null;
+    // Cancel all temporary unblacklist timers
+    for (final timer in _temporaryUnblacklistTimers.values) {
+      timer.cancel();
+    }
+    _temporaryUnblacklistTimers.clear();
   }
 
   Future<void> _poll(BuildContext context) async {
-    final fgApp = ProcessMonitor.getForegroundProcess();
-    print('[Monitor] Foreground process: $fgApp');
+    final allProcsOriginal = ProcessMonitor.listProcesses();
+    final allProcs =
+        allProcsOriginal.map((e) => e.trim().toLowerCase()).toList();
     final whitelist =
         (await ConfigService.loadWhitelist())
             .map((e) => e.trim().toLowerCase())
@@ -32,74 +62,81 @@ class MonitorService {
         (await ConfigService.loadBlacklist())
             .map((e) => e.trim().toLowerCase())
             .toList();
-    final allProcsOriginal = ProcessMonitor.listProcesses();
-    final allProcs =
-        allProcsOriginal.map((e) => e.trim().toLowerCase()).toList();
-    print('[Monitor] All running processes: $allProcsOriginal');
-    print('[Monitor] Whitelist: $whitelist');
-    print('[Monitor] Blacklist: $blacklist');
-    print('in _poll');
-    if (fgApp == null) return;
-    final fgAppLower = fgApp.trim().toLowerCase();
-    final isFocusMode = whitelist.contains(fgAppLower);
-    print('in _poll 2');
-    // Manually parse all running processes and check for any blacklisted process
+    // Check if any whitelist app is running (in allProcs)
+    bool anyWhitelistRunning = allProcs.any((proc) => whitelist.contains(proc));
+    // Set focus mode state based on whitelist presence
+    await FirebaseService.setFocusState(anyWhitelistRunning);
+    if (!anyWhitelistRunning) {
+      return;
+    }
+    // For every blacklisted process running, show popup (if not already prompted and not in cooldown)
     for (int i = 0; i < allProcs.length; i++) {
       final proc = allProcs[i];
-      // Debug print to show what is being compared
-      print(
-        'Comparing process: "' +
-            proc +
-            '" against blacklist: ' +
-            blacklist.toString(),
-      );
       if (blacklist.contains(proc)) {
         final originalProc = allProcsOriginal[i];
-        print(
-          '[Monitor] Distraction app detected: $originalProc (focus mode: $isFocusMode)',
-        );
-        // If in focus mode (work app in foreground), activate popup for each blacklisted process
-        if (isFocusMode) {
-          if (_lastPromptedApp == proc)
-            continue; // Avoid repeat prompts for same app
-          _lastPromptedApp = proc;
-          final reason = await showPromptDialog(context, originalProc);
-          print(
-            '[Monitor] Popup shown for $originalProc, user reason: $reason',
+        if (isAppInPromptCooldown(proc) || _appsWithOpenPrompt.contains(proc))
+          continue;
+        _appsWithOpenPrompt.add(proc);
+        final result = await showPromptDialog(context, originalProc);
+        _appsWithOpenPrompt.remove(proc);
+        if (result == null || result.action == PromptAction.exit) {
+          ProcessMonitor.killProcess(originalProc);
+          setAppPromptCooldown(proc);
+        } else if (result.action == PromptAction.submit) {
+          await FirebaseService.sendDistractionEvent(
+            originalProc,
+            result.reason,
           );
-          if (reason == null || reason.isEmpty) {
-            final killed = ProcessMonitor.killProcess(originalProc);
-            print('❌ Killed $killed instance(s) of $originalProc');
-          } else {
-            await FirebaseService.sendDistractionEvent(originalProc, reason);
-            print('✅ Allowed $originalProc with reason: $reason');
-          }
+          await _temporarilyRemoveFromBlacklist(
+            proc,
+            Duration(minutes: 10),
+            context,
+          );
         }
       }
     }
-    // If not in focus mode, reset last prompted app
-    if (!isFocusMode) {
-      _lastPromptedApp = null;
-    }
+  }
+
+  Future<void> _temporarilyRemoveFromBlacklist(
+    String proc,
+    Duration duration,
+    BuildContext context,
+  ) async {
+    final blacklist =
+        (await ConfigService.loadBlacklist())
+            .map((e) => e.trim().toLowerCase())
+            .toList();
+    if (!blacklist.contains(proc)) return;
+    // Remove from blacklist
+    blacklist.remove(proc);
+    await ConfigService.saveBlacklist(blacklist);
+    // Set timer to add back after duration
+    _temporaryUnblacklistTimers[proc]?.cancel();
+    _temporaryUnblacklistTimers[proc] = Timer(duration, () async {
+      final currentBlacklist =
+          (await ConfigService.loadBlacklist())
+              .map((e) => e.trim().toLowerCase())
+              .toList();
+      if (!currentBlacklist.contains(proc)) {
+        currentBlacklist.add(proc);
+        await ConfigService.saveBlacklist(currentBlacklist);
+        // No need to set _lastPromptedApp anymore
+      }
+      _temporaryUnblacklistTimers.remove(proc);
+    });
   }
 
   static Future<bool> isFocusAppActive() async {
-    final fgApp = ProcessMonitor.getForegroundProcess();
     final allProcs = ProcessMonitor.listProcesses();
     final whitelist =
         (await ConfigService.loadWhitelist())
             .map((e) => e.toLowerCase())
             .toList();
-    final blacklist =
-        (await ConfigService.loadBlacklist())
-            .map((e) => e.toLowerCase())
-            .toList();
-    print('[Monitor] Foreground process: $fgApp');
-    print('asdasd');
-    print('[Monitor] All running processes: $allProcs');
-    print('[Monitor] Whitelist: $whitelist');
-    print('[Monitor] Blacklist: $blacklist');
-    if (fgApp == null) return false;
-    return whitelist.contains(fgApp.toLowerCase());
+    // Return true if ANY whitelisted process is running
+    return allProcs
+        .map((e) => e.toLowerCase())
+        .any((proc) => whitelist.contains(proc));
   }
 }
+
+// UNIQUE_PRINT_28: End of file
