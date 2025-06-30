@@ -6,6 +6,7 @@ import time
 from monitor import is_focus_app_active, monitor_and_prompt, skip_existing
 from firebase_db import set_focus_state
 from config import POLL_INTERVAL, WHITELIST_FILE, BLACKLIST_FILE
+from config import USER_ID
 
 PRIMARY = "#362DB7"
 ACCENT = "#6C64E9"
@@ -36,7 +37,7 @@ def edit_app_list(filepath, title):
 
     editor = tk.Toplevel()
     editor.title(title + " (Live)")
-    editor.geometry("400x400")
+    editor.geometry("600x600")
     editor.configure(bg=BACKGROUND)
 
     listbox = tk.Listbox(editor, selectmode=tk.MULTIPLE, bg="white", fg=TEXT)
@@ -75,14 +76,25 @@ def edit_app_list(filepath, title):
 
     tk.Button(editor, text="Add App", command=add_app, bg=PRIMARY, fg="white").pack(pady=5)
     tk.Button(editor, text="Remove Selected", command=remove_selected, bg="red", fg="white").pack(pady=5)
-    tk.Button(editor, text="Close", command=editor.destroy, bg="gray", fg="white").pack(pady=10)
+    tk.Button(editor, text="Close", command=editor.destroy, bg="gray", fg="white").pack(pady=5)
+
+
+def draw_rounded_rect(canvas, x1, y1, x2, y2, r, **kwargs):
+    """Draw a rounded rectangle on a canvas."""
+    canvas.create_arc(x1, y1, x1+r*2, y1+r*2, start=90, extent=90, style='pieslice', **kwargs)
+    canvas.create_arc(x2-r*2, y1, x2, y1+r*2, start=0, extent=90, style='pieslice', **kwargs)
+    canvas.create_arc(x1, y2-r*2, x1+r*2, y2, start=180, extent=90, style='pieslice', **kwargs)
+    canvas.create_arc(x2-r*2, y2-r*2, x2, y2, start=270, extent=90, style='pieslice', **kwargs)
+    canvas.create_rectangle(x1+r, y1, x2-r, y2, **kwargs)
+    canvas.create_rectangle(x1, y1+r, x2, y2-r, **kwargs)
+
 
 def build_gui():
     global monitoring, monitor_thread
 
     root = tk.Tk()
     root.title("🧠 Synapse Dashboard")
-    root.geometry("450x350")
+    root.geometry("500x420")
     root.resizable(False, False)
     root.configure(bg=BACKGROUND)
 
@@ -95,7 +107,19 @@ def build_gui():
     root.protocol("WM_DELETE_WINDOW", graceful_exit)
 
     tk.Label(root, text="Synapse", font=("Montserrat", 16, "bold"),
-             fg=TEXT, bg=BACKGROUND).pack(pady=10)
+             fg=TEXT, bg=BACKGROUND).pack(pady=(10, 5))
+
+    # 👤 User ID Label
+    tk.Label(root, text=f"User ID: {USER_ID}", font=("Montserrat", 14),
+             fg=TEXT, bg=BACKGROUND).pack(pady=(0, 5))
+
+ # 🟦 Rounded Instruction Label using Canvas
+    instruction_canvas = tk.Canvas(root, width=380, height=40, bg=BACKGROUND, highlightthickness=0)
+    instruction_canvas.pack(pady=(0, 10))
+
+    draw_rounded_rect(instruction_canvas, 5, 5, 375, 35, r=10, fill="gray", outline="gray")
+    instruction_canvas.create_text(190, 20, text="Enter this on your phone to sync with your PC",
+                                   fill=TEXT, font=("Montserrat", 12))
 
     status_label = tk.Label(root, text="Monitoring: OFF", font=("Montserrat", 12),
                             fg=TEXT, bg=BACKGROUND)
@@ -106,14 +130,26 @@ def build_gui():
     monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
     monitor_thread.start()
 
-    tk.Button(root, text="Edit Whitelist", font=("Montserrat", 11),
-              bg=ACCENT, fg="white", command=lambda: edit_app_list(WHITELIST_FILE, "Whitelist")).pack(pady=5)
+     # 📦 Button Frame for uniform layout
+    button_frame = tk.Frame(root, bg=BACKGROUND)
+    button_frame.pack(pady=(10, 20), fill=tk.X)
 
-    tk.Button(root, text="Edit Blacklist", font=("Montserrat", 11),
-              bg=PRIMARY, fg="white", command=lambda: edit_app_list(BLACKLIST_FILE, "Blacklist")).pack(pady=5)
+    def create_full_width_button(text, bg_color, command):
+        btn = tk.Button(button_frame, text=text, font=("Montserrat", 11),
+                        bg=bg_color, fg="white", relief="flat", height=2,
+                        activebackground=bg_color, activeforeground="white",
+                        command=command)
+        btn.pack(pady=5, padx=40, fill=tk.X)  # fill X + padding = uniform look
 
-    tk.Button(root, text="Exit Synapse", font=("Montserrat", 11),
-              bg="gray", fg="white", command=graceful_exit).pack(pady=20)
+    create_full_width_button("Edit Whitelist", ACCENT,
+                             lambda: edit_app_list(WHITELIST_FILE, "Whitelist"))
+
+    create_full_width_button("Edit Blacklist", PRIMARY,
+                             lambda: edit_app_list(BLACKLIST_FILE, "Blacklist"))
+
+    create_full_width_button("Exit Synapse", "gray", graceful_exit)
+
+
 
     root.mainloop()
 
