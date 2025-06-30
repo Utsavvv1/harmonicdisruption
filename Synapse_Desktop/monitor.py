@@ -30,7 +30,7 @@ def load_blacklist():
         return set()
 
 already_prompted = {}
-COOLDOWN = 600
+COOLDOWN = 120
 
 def is_focus_app_active():
     whitelist = load_whitelist()
