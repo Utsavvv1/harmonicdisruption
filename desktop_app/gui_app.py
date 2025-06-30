@@ -26,19 +26,7 @@ def get_resource_path(filename):
         return os.path.join(sys._MEIPASS, filename)
     return filename
 
-# --- Start/Stop Monitoring ---
-def toggle_monitoring(label):
-    global monitoring, monitor_thread
-
-    if not monitoring:
-        monitoring = True
-        label.config(text="🟢 Monitoring: ON")
-        monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
-        monitor_thread.start()
-    else:
-        monitoring = False
-        label.config(text="🔴 Monitoring: OFF")
-
+# --- Monitoring Thread Logic ---
 def monitor_loop():
     skip_existing()
     while monitoring:
@@ -56,7 +44,6 @@ def edit_app_list(filename, title):
         with open(path, "r") as f:
             raw_data = json.load(f)
 
-        # Accepts key as either "apps", "allowed_apps", or "blocked_apps"
         key = next((k for k in raw_data if isinstance(raw_data[k], list)), None)
         if not key:
             raise ValueError("No valid list key found in JSON.")
@@ -88,7 +75,6 @@ def edit_app_list(filename, title):
             save_list()
             entry.delete(0, tk.END)
 
-
     def remove_selected():
         selected_indices = listbox.curselection()
         for index in reversed(selected_indices):
@@ -117,6 +103,8 @@ def edit_app_list(filename, title):
 
 # --- GUI Layout ---
 def build_gui():
+    global monitoring, monitor_thread
+
     root = tk.Tk()
     root.title("🧠 Synapse Dashboard")
     root.geometry("400x300")
@@ -129,9 +117,11 @@ def build_gui():
                             fg=TEXT, bg=BACKGROUND)
     status_label.pack(pady=5)
 
-    tk.Button(root, text="Toggle Monitoring", font=("Helvetica", 12, "bold"),
-              bg=PRIMARY, fg="white", activebackground=ACCENT,
-              command=lambda: toggle_monitoring(status_label)).pack(pady=10)
+    # ✅ Start monitoring immediately
+    monitoring = True
+    status_label.config(text="🟢 Monitoring: ON")
+    monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
+    monitor_thread.start()
 
     tk.Button(root, text="Edit Whitelist", font=("Helvetica", 11),
               bg=PRIMARY, fg="white", activebackground=ACCENT,
@@ -141,8 +131,15 @@ def build_gui():
               bg=PRIMARY, fg="white", activebackground=ACCENT,
               command=lambda: edit_app_list("blacklist.json", "Edit Blacklist")).pack(pady=5)
 
+    # ✅ Clean shutdown and stop monitoring
+    def graceful_exit():
+        global monitoring
+        monitoring = False
+        status_label.config(text="🔴 Monitoring: OFF")
+        root.destroy()
+
     tk.Button(root, text="Exit Synapse", font=("Helvetica", 11),
-              bg="gray", fg="white", command=root.destroy).pack(pady=20)
+              bg="gray", fg="white", command=graceful_exit).pack(pady=20)
 
     root.mainloop()
 
