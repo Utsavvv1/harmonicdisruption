@@ -1,5 +1,3 @@
-# prompt_ui.py
-
 import tkinter as tk
 
 PRIMARY = "#362DB7"
@@ -8,16 +6,22 @@ BACKGROUND = "#F4EAEA"
 TEXT = "#1A171A"
 
 def show_prompt(app_name):
-    reason = []
+    result = {"reason": ""}
 
     def submit():
-        reason.append(text.get("1.0", "end-1c").strip())
+        result["reason"] = text.get("1.0", "end-1c").strip()
+        root.destroy()
+
+    def on_close():
+        # Treat window close (X) as no response → trigger kill
+        result["reason"] = ""
         root.destroy()
 
     root = tk.Tk()
     root.title("🧠 Synapse – Distraction Monitor")
     root.geometry("400x300")
     root.configure(bg=BACKGROUND)
+    root.protocol("WM_DELETE_WINDOW", on_close)  # Handle close button
 
     tk.Label(root, text="🧠 Synapse Alert", font=("Helvetica", 16, "bold"), fg=TEXT, bg=BACKGROUND).pack(pady=15)
     tk.Label(root, text=f"You opened: {app_name}", font=("Helvetica", 12), fg=TEXT, bg=BACKGROUND).pack()
@@ -26,7 +30,8 @@ def show_prompt(app_name):
     text = tk.Text(root, height=5, width=40, bg="white", fg=TEXT, bd=1, relief="solid")
     text.pack()
 
-    tk.Button(root, text="Submit", bg=PRIMARY, fg="white", activebackground=ACCENT, activeforeground="white", font=("Helvetica", 11, "bold"), command=submit).pack(pady=15)
+    tk.Button(root, text="Submit", bg=PRIMARY, fg="white", activebackground=ACCENT, activeforeground="white",
+              font=("Helvetica", 11, "bold"), command=submit).pack(pady=15)
 
     root.mainloop()
-    return reason[0] if reason else "No response"
+    return result["reason"]
