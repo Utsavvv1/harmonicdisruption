@@ -26,7 +26,7 @@ A lightweight distraction-monitoring tool for Windows that detects and handles b
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/synapse-focus.git
+git clone https://github.com/Utsavvv1/harmonicdisruption.git
 cd synapse-focus
 ```
 
@@ -43,14 +43,6 @@ venv\Scripts\activate  # For Windows
 pip install -r require.txt
 ```
 
-## Configuration
-
-### Whitelist and Blacklist
-
-Edit these two JSON files in the root folder:
-- whitelist.json (for allowed productive apps)
-- blacklist.json (for distracting apps)
-
 ## Run the App
 
 ```bash
@@ -61,5 +53,5 @@ python gui_app.py
 
 ```bash
 pip install pyinstaller
-pyinstaller --noconfirm --windowed --onefile app.py
+pyinstaller gui_app.py --name Synapse --onefile --noconsole --icon=logosynapse.ico --add-data ".env;."
 ```
