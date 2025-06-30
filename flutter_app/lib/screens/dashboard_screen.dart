@@ -26,6 +26,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     _loadUserId();
     _setMinWindowSize();
     _startAutoFocusMonitor();
+    _monitorService.startMonitoring(context);
   }
 
   Future<void> _loadUserId() async {
@@ -47,7 +48,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _monitoring = focus;
       });
       await FirebaseService.setFocusState(focus);
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(milliseconds: 100));
       return mounted;
     });
   }
