@@ -100,7 +100,6 @@ def edit_app_list(filename, title):
     tk.Button(editor, text="Close", command=editor.destroy,
               bg="gray", fg="white").pack(pady=10)
 
-# --- GUI Layout ---
 def build_gui():
     global monitoring, monitor_thread
 
@@ -108,6 +107,16 @@ def build_gui():
     root.title("🧠 Synapse Dashboard")
     root.geometry("400x300")
     root.configure(bg=BACKGROUND)
+
+    # ✅ Ensure graceful_exit runs even on ❌ close
+    def graceful_exit():
+        global monitoring
+        monitoring = False
+        set_focus_state(False)  # 🔁 Reset focus mode on exit
+        status_label.config(text="🔴 Monitoring: OFF")
+        root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", graceful_exit)
 
     tk.Label(root, text="Synapse – Focus Monitor", font=("Helvetica", 16, "bold"),
              fg=TEXT, bg=BACKGROUND).pack(pady=10)
@@ -130,13 +139,6 @@ def build_gui():
               bg=PRIMARY, fg="white", activebackground=ACCENT,
               command=lambda: edit_app_list("blacklist.json", "Edit Blacklist")).pack(pady=5)
 
-    # ✅ Clean shutdown and stop monitoring
-    def graceful_exit():
-        global monitoring
-        monitoring = False
-        status_label.config(text="🔴 Monitoring: OFF")
-        root.destroy()
-
     tk.Button(root, text="Exit Synapse", font=("Helvetica", 11),
               bg="gray", fg="white", command=graceful_exit).pack(pady=20)
 
@@ -144,4 +146,5 @@ def build_gui():
 
 # --- Entry Point ---
 if __name__ == "__main__":
+    set_focus_state(False)
     build_gui()
