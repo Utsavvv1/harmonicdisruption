@@ -9,14 +9,17 @@ def main():
     print("🧠 Synapse Desktop Monitor Running...")
     skip_existing()
 
-    while True:
-        focus = is_focus_app_active()
-        set_focus_state(focus)
+    try:
+        while True:
+            focus = is_focus_app_active()
+            set_focus_state(focus)
 
-        if focus:
-            monitor_and_prompt()
+            if focus:
+                monitor_and_prompt()
 
-        time.sleep(POLL_INTERVAL)
+            time.sleep(POLL_INTERVAL)
+    except KeyboardInterrupt:
+        print("\n🛑 Monitoring stopped by user.")
 
 if __name__ == "__main__":
     main()

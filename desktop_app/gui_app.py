@@ -82,11 +82,12 @@ def edit_app_list(filename, title):
 
     def add_app():
         app = entry.get().strip()
-        if app and app not in data:
+        if app and app.lower().endswith(".exe") and app not in data:
             data.append(app)
             listbox.insert(tk.END, app)
             save_list()
             entry.delete(0, tk.END)
+
 
     def remove_selected():
         selected_indices = listbox.curselection()

@@ -30,3 +30,17 @@ def send_distraction_event(app_name: str, reason: str):
             print("❌ Failed to send distraction event:", res.text)
     except Exception as e:
         print("Firebase Error:", e)
+
+# ➤ Read from: users/User1/settings/focusMode
+def get_focus_mode():
+    url = f"{FIREBASE_URL}/users/{USER_ID}/settings/focusMode.json?auth={API_KEY}"
+    try:
+        res = requests.get(url)
+        if res.status_code == 200:
+            return res.json() is True  # ensure it's a boolean True
+        else:
+            print("❌ Failed to read focusMode:", res.text)
+            return False
+    except Exception as e:
+        print("Firebase Error (read):", e)
+        return False
