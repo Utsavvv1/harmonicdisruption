@@ -26,7 +26,7 @@ def monitor_loop():
             status_label.after(0, lambda: status_label.config(text="Focus Mode: ON", fg="green"))
             monitor_and_prompt()
         else:
-            status_label.after(0, lambda: status_label.config(text="Focus Mode OFF", fg="red"))
+            status_label.after(0, lambda: status_label.config(text="Focus Mode: OFF", fg="red"))
 
         time.sleep(POLL_INTERVAL)
 
