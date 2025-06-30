@@ -116,22 +116,16 @@ def build_gui():
 
     font_spec = ("Montserrat", 14)
 
-    # Measure text width
     tmp = tk.Label(root, font=font_spec)
     user_id_text = f"{USER_ID}"
     label_text = "User ID:"
-
     label_width = tmp.tk.call("font", "measure", font_spec, "-displayof", ".", label_text)
     user_id_width = tmp.tk.call("font", "measure", font_spec, "-displayof", ".", user_id_text)
     total_width = int(label_width) + int(user_id_width) + 1
-
-    # Start drawing from center
     start_x = 200 - (total_width // 2)
 
     user_canvas.create_text(start_x, 15, text=label_text, fill=TEXT, font=font_spec, anchor="w")
     user_canvas.create_text(start_x + label_width, 15, text=user_id_text, fill=ACCENT, font=font_spec, anchor="w")
-
-
 
     instruction_canvas = tk.Canvas(root, width=380, height=40, bg=BACKGROUND, highlightthickness=0)
     instruction_canvas.pack(pady=(0, 10))
@@ -171,12 +165,14 @@ def build_gui():
             command()
 
         canvas.tag_bind(canvas_id, "<Button-1>", on_click)
-        canvas.bind("<Button-1>", on_click)
+        # Optional: hover cursor
+        canvas.tag_bind(canvas_id, "<Enter>", lambda e: canvas.config(cursor="hand2"))
+        canvas.tag_bind(canvas_id, "<Leave>", lambda e: canvas.config(cursor=""))
 
-    create_rounded_canvas_button("Edit Whitelist", ACCENT,
+    create_rounded_canvas_button("Edit Work Apps", ACCENT,
                                  lambda: edit_app_list(WHITELIST_FILE, "Whitelist"))
 
-    create_rounded_canvas_button("Edit Blacklist", PRIMARY,
+    create_rounded_canvas_button("Edit Distractions", PRIMARY,
                                  lambda: edit_app_list(BLACKLIST_FILE, "Blacklist"))
 
     create_rounded_canvas_button("Exit Synapse", "gray", graceful_exit)
