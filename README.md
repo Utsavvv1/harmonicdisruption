@@ -10,14 +10,15 @@ A lightweight distraction-monitoring tool for Windows that detects and handles b
 - Prompts user for justification via a GUI.
 - Automatically kills distracting apps if no reason is given.
 - Real-time GUI to edit whitelist and blacklist.
-- Firebase integration to log distraction events (optional).
+- Firebase integration to log distraction events.
+- Syncs with Flutter based phone app to prevent distactions on phone.
 
 ---
 
 ## 🧩 Requirements
 
-- **Windows OS**
-- **Python 3.8+**
+- *Windows OS*
+- *Python 3.8+*
 
 ---
 
@@ -25,33 +26,41 @@ A lightweight distraction-monitoring tool for Windows that detects and handles b
 
 ### 1. Clone the Repository
 
-```bash
+bash
+```
 git clone https://github.com/Utsavvv1/harmonicdisruption.git
 cd synapse-focus
 ```
 
+
 ### 2. Create a Virtual Environment (optional)
 
-```bash
+bash
+```
 python -m venv venv
 venv\Scripts\activate  # For Windows
 ```
 
 ### 3. Install Dependencies
 
-```bash
+bash
+```
 pip install -r require.txt
 ```
 
+
 ## Run the App
 
-```bash
+bash
+```
 python gui_app.py
 ```
 
+
 ## Optional: Create executable
 
-```bash
+bash
+```
 pip install pyinstaller
 pyinstaller gui_app.py --name Synapse --onefile --noconsole --icon=logosynapse.ico --add-data ".env;."
 ```

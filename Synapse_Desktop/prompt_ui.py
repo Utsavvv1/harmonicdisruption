@@ -23,12 +23,16 @@ def show_prompt(app_name):
     root.geometry("450x350")
     root.resizable(False, False)
     root.configure(bg=BACKGROUND)
-    root.protocol("WM_DELETE_WINDOW", on_close)  # Handle close button
+    root.protocol("WM_DELETE_WINDOW", on_close)
+
+    # 🧠 Force window to stay on top
+    root.attributes("-topmost", True)
+    root.lift()
+    root.focus_force()
 
     tk.Label(root, text="HOLD UP!", font=("Montserrat", 14, "bold"), fg=TEXT, bg=BACKGROUND).pack(pady=15)
     tk.Label(root, text="You are currently in focus mode.", font=("Montserrat", 10), fg=TEXT, bg=BACKGROUND).pack()
     tk.Label(root, text=f"What is your motive to open {app_name.title()}?", font=("Montserrat", 12), fg=TEXT, bg=BACKGROUND).pack(pady=(20, 5))
-
 
     text_border = tk.Frame(root, background=PRIMARY, bd=0)
     text_border.pack(pady=10)
@@ -36,9 +40,9 @@ def show_prompt(app_name):
     text = tk.Text(text_border, height=3, width=40, bg=BACKGROUND, fg="grey", bd=0, relief="flat", insertbackground="white")
     text.pack(padx=2, pady=2)
 
-
     tk.Button(root, text="Submit", bg=PRIMARY, fg="white", activebackground=ACCENT, activeforeground="white",
               font=("Montserrat", 11, "bold"), command=submit).pack(pady=15)
 
     root.mainloop()
     return result["reason"]
+
