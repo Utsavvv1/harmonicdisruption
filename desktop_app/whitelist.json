@@ -1,5 +1,20 @@
 {
   "allowed_apps": [
-    "Notion.exe"
+    "Notion.exe",
+    "Code.exe",
+    "Word.exe",
+    "Excel.exe",
+    "PowerPoint.exe",
+    "Acrobat.exe",
+    "obsidian.exe",
+    "pycharm64.exe",
+    "idea64.exe",
+    "chrome.exe",
+    "firefox.exe",
+    "Postman.exe",
+    "Teams.exe",
+    "Zoom.exe",
+    "OneNote.exe",
+    "Outlook.exe"
   ]
 }

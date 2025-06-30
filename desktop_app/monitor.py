@@ -10,18 +10,30 @@ import sys
 from prompt_ui import show_prompt
 from firebase_db import send_distraction_event, get_focus_mode
 
-# Get safe file path (for PyInstaller or script mode)
+# --- Resource Path Helper (PyInstaller-safe) ---
 def get_resource_path(filename):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, filename)
     return os.path.join(os.path.dirname(__file__), filename)
 
-# Load whitelist and blacklist JSONs
-with open(get_resource_path("whitelist.json")) as f:
-    WHITELIST = set(app.lower().replace('.exe', '') for app in json.load(f)["allowed_apps"])
+# --- Load JSON Lists Dynamically ---
+def load_whitelist():
+    try:
+        with open(get_resource_path("whitelist.json")) as f:
+            data = json.load(f).get("allowed_apps", [])
+            return set(app.lower().replace(".exe", "") for app in data)
+    except Exception as e:
+        print("⚠️ Failed to load whitelist:", e)
+        return set()
 
-with open(get_resource_path("blacklist.json")) as f:
-    BLACKLIST = set(app.lower().replace('.exe', '') for app in json.load(f)["distraction_apps"])
+def load_blacklist():
+    try:
+        with open(get_resource_path("blacklist.json")) as f:
+            data = json.load(f).get("distraction_apps", [])
+            return set(app.lower().replace(".exe", "") for app in data)
+    except Exception as e:
+        print("⚠️ Failed to load blacklist:", e)
+        return set()
 
 # --- Globals ---
 already_prompted = {}
@@ -32,8 +44,12 @@ def normalize(name):
     return name.lower().replace('.exe', '')
 
 def is_focus_app_active():
-    """True if any whitelisted app is running in background or foreground."""
-    return any(normalize(p.info['name']) in WHITELIST for p in psutil.process_iter(['name']) if p.info['name'])
+    whitelist = load_whitelist()
+    return any(
+        normalize(p.info['name']) in whitelist
+        for p in psutil.process_iter(['name'])
+        if p.info['name']
+    )
 
 def get_foreground_apps():
     visible = set()
@@ -59,12 +75,13 @@ def kill_all_instances(app_name):
 
 def skip_existing():
     now = int(time.time())
+    blacklist = load_blacklist()
     for name, _ in get_foreground_apps():
-        if name in BLACKLIST:
+        if name in blacklist:
             already_prompted[name] = now
             print(f"⏳ Skipped existing: {name}")
 
-# --- Main Logic ---
+# --- Core Monitoring Logic ---
 def monitor_and_prompt():
     now = int(time.time())
     running_processes = {
@@ -76,8 +93,10 @@ def monitor_and_prompt():
         return
 
     if get_focus_mode():
+        blacklist = load_blacklist()
+
         for name, pid in running_processes.items():
-            if name not in BLACKLIST:
+            if name not in blacklist:
                 continue
             if now - already_prompted.get(name, 0) < COOLDOWN:
                 continue

@@ -16,15 +16,13 @@ ACCENT = "#6C64E9"
 BACKGROUND = "#F4EAEA"
 TEXT = "#1A171A"
 
-# Global flag to control monitoring
 monitoring = False
 monitor_thread = None
 
-# 🔧 Helper for locating bundled files (e.g., in PyInstaller)
 def get_resource_path(filename):
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, filename)
-    return filename
+    return os.path.join(os.path.dirname(__file__), filename)
 
 # --- Monitoring Thread Logic ---
 def monitor_loop():
@@ -36,7 +34,7 @@ def monitor_loop():
             monitor_and_prompt()
         time.sleep(POLL_INTERVAL)
 
-# --- GUI-Based JSON List Editor (Whitelist / Blacklist) ---
+# --- JSON List Editor (Live Dynamic) ---
 def edit_app_list(filename, title):
     path = get_resource_path(filename)
 
@@ -54,7 +52,7 @@ def edit_app_list(filename, title):
         return
 
     editor = tk.Toplevel()
-    editor.title(title)
+    editor.title(title + " (Live)")
     editor.geometry("400x400")
     editor.configure(bg=BACKGROUND)
 
@@ -89,6 +87,7 @@ def edit_app_list(filename, title):
             raw_data[key] = data
             with open(path, "w") as f:
                 json.dump(raw_data, f, indent=4)
+            print(f"✅ {filename} updated")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to save file:\n{e}")
 
@@ -123,11 +122,11 @@ def build_gui():
     monitor_thread = threading.Thread(target=monitor_loop, daemon=True)
     monitor_thread.start()
 
-    tk.Button(root, text="Edit Whitelist", font=("Helvetica", 11),
+    tk.Button(root, text="Edit Whitelist (Live)", font=("Helvetica", 11),
               bg=PRIMARY, fg="white", activebackground=ACCENT,
               command=lambda: edit_app_list("whitelist.json", "Edit Whitelist")).pack(pady=5)
 
-    tk.Button(root, text="Edit Blacklist", font=("Helvetica", 11),
+    tk.Button(root, text="Edit Blacklist (Live)", font=("Helvetica", 11),
               bg=PRIMARY, fg="white", activebackground=ACCENT,
               command=lambda: edit_app_list("blacklist.json", "Edit Blacklist")).pack(pady=5)
 
