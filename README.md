@@ -53,5 +53,5 @@ python gui_app.py
 
 ```bash
 pip install pyinstaller
-pyinstaller --noconfirm --windowed --onefile app.py
+pyinstaller gui_app.py --name Synapse --onefile --noconsole --icon=your_icon.ico --add-data ".env;."
 ```
