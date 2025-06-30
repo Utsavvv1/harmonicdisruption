@@ -58,7 +58,7 @@ DEFAULT_WHITELIST = {
 
 DEFAULT_BLACKLIST = {
     "distraction_apps": [
-        "YouTube.exe", "Discord.exe", "Instagram.exe", "WhatsApp.exe", "Telegram.exe",
+        "YouTube.exe", "Discord.exe", "Instagram.exe", "Telegram.exe",
         "Snapchat.exe", "Netflix.exe", "Facebook.exe", "Reddit.exe", "Steam.exe",
         "Valorant.exe", "EpicGamesLauncher.exe", "robloxplayerbeta.exe", "Twitch.exe",
         "TikTok.exe", "OperaGX.exe", "Messenger.exe", "VLC.exe", "CrabGame.exe",
