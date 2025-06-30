@@ -40,13 +40,13 @@ def edit_app_list(filepath, title):
     editor.geometry("600x600")
     editor.configure(bg=BACKGROUND)
 
-    listbox = tk.Listbox(editor, selectmode=tk.MULTIPLE, bg="white", fg=TEXT)
+    listbox = tk.Listbox(editor, selectmode=tk.MULTIPLE, bg=BACKGROUND, fg=TEXT)
     listbox.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
     for item in data:
         listbox.insert(tk.END, item)
 
-    entry = tk.Entry(editor, width=30, bg="white", fg=TEXT)
+    entry = tk.Entry(editor, width=30, bg=BACKGROUND, fg=TEXT)
     entry.pack(pady=5)
 
     def add_app():
