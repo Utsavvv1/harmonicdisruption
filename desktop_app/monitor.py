@@ -4,51 +4,39 @@ import time
 import win32gui
 import win32process
 import subprocess
-import os
-import sys
 
 from prompt_ui import show_prompt
 from firebase_db import send_distraction_event, get_focus_mode
+from config import WHITELIST_FILE, BLACKLIST_FILE
 
-# --- Resource Path Helper (PyInstaller-safe) ---
-def get_resource_path(filename):
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, filename)
-    return os.path.join(os.path.dirname(__file__), filename)
+# --- Helpers ---
+def normalize(name):
+    return name.lower().replace('.exe', '')
 
-# --- Load JSON Lists Dynamically ---
 def load_whitelist():
     try:
-        with open(get_resource_path("whitelist.json")) as f:
-            data = json.load(f).get("allowed_apps", [])
-            return set(app.lower().replace(".exe", "") for app in data)
+        with open(WHITELIST_FILE) as f:
+            return set(normalize(app) for app in json.load(f).get("allowed_apps", []))
     except Exception as e:
         print("⚠️ Failed to load whitelist:", e)
         return set()
 
 def load_blacklist():
     try:
-        with open(get_resource_path("blacklist.json")) as f:
-            data = json.load(f).get("distraction_apps", [])
-            return set(app.lower().replace(".exe", "") for app in data)
+        with open(BLACKLIST_FILE) as f:
+            return set(normalize(app) for app in json.load(f).get("distraction_apps", []))
     except Exception as e:
         print("⚠️ Failed to load blacklist:", e)
         return set()
 
-# --- Globals ---
 already_prompted = {}
-COOLDOWN = 600  # seconds
-
-# --- Helpers ---
-def normalize(name):
-    return name.lower().replace('.exe', '')
+COOLDOWN = 600
 
 def is_focus_app_active():
     whitelist = load_whitelist()
     return any(
         normalize(p.info['name']) in whitelist
-        for p in psutil.process_iter(['name'])
-        if p.info['name']
+        for p in psutil.process_iter(['name']) if p.info['name']
     )
 
 def get_foreground_apps():
@@ -66,12 +54,11 @@ def get_foreground_apps():
     return list(visible)
 
 def kill_all_instances(app_name):
-    """Kills all processes with matching .exe name (e.g., Spotify.exe)"""
     try:
         subprocess.run(["taskkill", "/IM", app_name, "/F"], check=True)
         print(f"❌ All instances of {app_name} killed")
     except subprocess.CalledProcessError:
-        print(f"⚠️ Could not kill all instances of {app_name}")
+        print(f"⚠️ Could not kill {app_name}")
 
 def skip_existing():
     now = int(time.time())
@@ -81,10 +68,9 @@ def skip_existing():
             already_prompted[name] = now
             print(f"⏳ Skipped existing: {name}")
 
-# --- Core Monitoring Logic ---
 def monitor_and_prompt():
     now = int(time.time())
-    running_processes = {
+    running = {
         normalize(p.info['name']): p.pid
         for p in psutil.process_iter(['name', 'pid']) if p.info['name']
     }
@@ -94,8 +80,7 @@ def monitor_and_prompt():
 
     if get_focus_mode():
         blacklist = load_blacklist()
-
-        for name, pid in running_processes.items():
+        for name, pid in running.items():
             if name not in blacklist:
                 continue
             if now - already_prompted.get(name, 0) < COOLDOWN:
@@ -108,10 +93,9 @@ def monitor_and_prompt():
                 try:
                     subprocess.run(["taskkill", "/PID", str(pid), "/F"], check=True)
                     print(f"❌ Closed {name} (PID {pid})")
-                except subprocess.CalledProcessError:
-                    print(f"⚠️ Could not kill PID {pid} — permission denied or already closed")
-
-                kill_all_instances(f"{name}.exe")  # full-force kill
+                except:
+                    print(f"⚠️ Could not kill {pid}")
+                kill_all_instances(f"{name}.exe")
             else:
                 already_prompted[name] = now
                 print(f"✅ Allowed {name}")
